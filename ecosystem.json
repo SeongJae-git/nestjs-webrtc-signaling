@@ -1,0 +1,17 @@
+{
+    "apps": [
+        {
+            "name": "Signaling",
+
+            "exec_mode": "cluster",
+
+            "script": "dist/main.js",
+
+            "instances": 3,
+
+            "autorestart": true,
+
+            "watch": false
+        }
+    ]
+}
