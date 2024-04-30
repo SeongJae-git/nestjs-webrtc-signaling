@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { RedisIoAdapter } from './configs/redis.io.adapter';
 @Module({
-    imports: [],
+    imports: [ConfigModule.forRoot()],
     controllers: [],
-    providers: []
+    providers: [RedisIoAdapter]
 })
 export class AppModule {}
