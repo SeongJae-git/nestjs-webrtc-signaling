@@ -40,7 +40,7 @@ export class RTCGateway implements OnGatewayInit, OnGatewayDisconnect {
                 break;
             }
             case RTC_STATUS.READY: {
-                console.log('준비완료');
+                console.log('준비완료 : ' + room);
                 const users = await this.rtcService.getParticipants(room);
                 console.log(users);
 

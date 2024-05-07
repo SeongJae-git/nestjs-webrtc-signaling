@@ -7,9 +7,10 @@ let iceServers = {
 };
 
 let creator = false;
-let room = 'testroom123456'; // 방 이름 설정
+let room;
 let userStream;
 let rtcPeerConnection;
+let iceCandidatesQueue = [];
 
 const userVideo = document.getElementById('user-video');
 const videoPage = document.getElementById('video-page');
@@ -37,10 +38,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         rtcPeerConnection
             .setRemoteDescription(new RTCSessionDescription(data.offer))
-            .then(() => rtcPeerConnection.createAnswer())
+            .then(() => {
+                addIceCandidatesFromQueue();
+
+                return rtcPeerConnection.createAnswer();
+            })
             .then((answer) => {
                 rtcPeerConnection.setLocalDescription(new RTCSessionDescription(answer));
 
+                return answer;
+            })
+            .then((answer) => {
                 socket.emit('CTS-answer', { answer, room: data.room });
             })
             .catch((error) => console.error(error));
@@ -48,22 +56,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     socket.on('STC-set-answer', (answer) => {
         console.log('STC-set-answer');
-        rtcPeerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-
-        alert('끝!');
+        rtcPeerConnection
+            .setRemoteDescription(new RTCSessionDescription(answer))
+            .then(() => {
+                addIceCandidatesFromQueue();
+            })
+            .catch((error) => {
+                console.error(`Error setting remote description: ${error.toString()}`);
+            });
     });
 
-    //////////////////////////////////
-
     socket.on('STC-ice-candidate', (data) => {
-        if (data.candidate) {
-            rtcPeerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+        console.log('STC-ice-candidate 호출');
+        if (rtcPeerConnection && data.candidate) {
+            const candidate = new RTCIceCandidate(data.candidate);
+
+            if (rtcPeerConnection.remoteDescription && rtcPeerConnection.remoteDescription.type) {
+                rtcPeerConnection.addIceCandidate(candidate).catch((error) => {
+                    console.log(`Failed to add ICE Candidate: ${error.toString()}`);
+                });
+            } else {
+                iceCandidatesQueue.push(candidate);
+            }
         }
     });
 });
 
 function webRTCJobInit() {
     document.getElementById('join').addEventListener('click', function () {
+        room = document.getElementById('room-name').value;
         socket.emit('CTS-join', room);
         videoPage.style.display = 'block';
     });
@@ -103,4 +124,14 @@ function preparePeerConnection() {
     userStream.getTracks().forEach((track) => {
         rtcPeerConnection.addTrack(track, userStream);
     });
+}
+
+function addIceCandidatesFromQueue() {
+    iceCandidatesQueue.forEach((candidate) => {
+        rtcPeerConnection.addIceCandidate(candidate).catch((error) => {
+            console.error(`Failed to add queued ICE Candidate: ${error.toString()}`);
+        });
+    });
+
+    iceCandidatesQueue = [];
 }
