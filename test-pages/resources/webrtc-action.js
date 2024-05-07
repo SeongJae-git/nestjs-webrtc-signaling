@@ -6,14 +6,14 @@ let iceServers = {
     iceServers: [{ urls: 'stun:stun.services.mozilla.com' }, { urls: 'stun:stun.l.google.com:19302' }]
 };
 
-let creator = false;
-let room;
-let userStream;
-let rtcPeerConnection;
-let iceCandidatesQueue = [];
+let creator = false; // 발신자 구분용
+let room; //
+let userStream; // userAgent
+let rtcPeerConnection; // RTC의 Peer 객체
+let iceCandidatesQueue = []; // remoteDescription이 등록되기 전 Candidate 교환 방지용
 
 const userVideo = document.getElementById('user-video');
-const videoPage = document.getElementById('video-page');
+const peerVideo = document.getElementById('peer-video');
 
 document.addEventListener('DOMContentLoaded', () => {
     webRTCJobInit();
@@ -86,7 +86,6 @@ function webRTCJobInit() {
     document.getElementById('join').addEventListener('click', function () {
         room = document.getElementById('room-name').value;
         socket.emit('CTS-join', room);
-        videoPage.style.display = 'block';
     });
 
     navigator.mediaDevices
@@ -97,7 +96,6 @@ function webRTCJobInit() {
         .then((stream) => {
             userStream = stream;
             userVideo.srcObject = stream;
-            userVideo.play();
         })
         .catch((err) => {
             alert(`Couldn't access user media: ${err.message}`);
@@ -132,6 +130,12 @@ function addIceCandidatesFromQueue() {
             console.error(`Failed to add queued ICE Candidate: ${error.toString()}`);
         });
     });
+
+    document.getElementById('camera-placeholder-local').style.display = 'none';
+    document.getElementById('camera-placeholder-remote').style.display = 'none';
+    peerVideo.style.display = 'block';
+    userVideo.style.display = 'block';
+    userVideo.play();
 
     iceCandidatesQueue = [];
 }

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Web RTC Test</title>
+        <style>
+            video {
+                width: 100%;
+                max-width: 700px;
+            } /* 비디오 크기 조정: Max qHD */
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                font-family: Arial, sans-serif;
+                background: #f0f0f0;
+            }
+            .container {
+                width: 60%;
+                height: 95%;
+                display: flex;
+                flex-direction: column;
+                border: 2px solid black;
+                background: white;
+            }
+            .content {
+                display: flex;
+                flex: 1;
+            }
+            .left-side {
+                display: flex;
+                flex-direction: column;
+                width: 75%;
+                height: 100%;
+            }
+            .right-side {
+                width: 25%;
+                height: 100%;
+                border-left: 2px solid black;
+                display: flex;
+                flex-direction: column;
+            }
+            .top-left,
+            .bottom-left,
+            .right-full {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: 2%;
+            }
+            .top-left {
+                height: calc(49% - 4px); /* Adjust height for margins */
+                border-bottom: 2px solid black;
+            }
+            .bottom-left {
+                height: calc(49% - 4px); /* Adjust height for margins */
+            }
+            .right-full {
+                height: calc(100% - 4%); /* Adjust height for margin */
+                display: flex;
+                flex-direction: column;
+            }
+            .right-header {
+                height: 50px; /* Height for the right header */
+                line-height: 50px;
+                text-align: center;
+                border-bottom: 2px solid black;
+                width: 100%;
+            }
+            .right-content {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start; /* 위에서부터 내용이 시작되도록 조정 */
+                overflow-y: auto; /* 내용이 넘치면 스크롤바 생성 */
+                padding: 10px; /* 컨텐츠에 약간의 패딩을 추가 */
+                width: 100%; /* 전체 너비를 사용하도록 설정 */
+            }
+        </style>
+    </head>
+    <body>
+        <div id="start-page">
+            <h2 class="text">Web RTC Test</h2>
+            <input type="text" id="room-name" placeholder="참가할 룸 이름" />
+            <button id="join">Join</button>
+        </div>
+        <div class="container">
+            <div class="content">
+                <div class="left-side">
+                    <div class="top-left">
+                        <span id="camera-placeholder-local">[ 내 카메라 영역 ]</span>
+                        <video id="user-video" autoplay muted style="display: none"></video>
+                    </div>
+                    <div class="bottom-left">
+                        <span id="camera-placeholder-remote">[ 상대방 카메라 영역 ]</span>
+                        <video id="peer-video" autoplay muted style="display: none"></video>
+                    </div>
+                </div>
+                <div class="right-side">
+                    <div class="right-full">
+                        <div class="right-header">참가자 목록</div>
+                        <div class="right-content">
+                            <span>참가자 1</span>
+
+                            <!-- 추가 참가자들도 이곳에 나열될 것입니다 -->
+                            <span>참가자 2</span>
+                            <span>참가자 3</span>
+                            <!-- 더 많은 참가자가 추가될 수 있습니다 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+
+    <script
+        src="https://cdn.socket.io/3.1.3/socket.io.min.js"
+        integrity="sha384-cPwlPLvBTa3sKAgddT6krw0cJat7egBga3DJepJyrLl4Q9/5WLra3rrnMcyTyOnh"
+        crossorigin="anonymous"
+    ></script>
+    <script src="./resources/webrtc-action.js"></script>
+</html>

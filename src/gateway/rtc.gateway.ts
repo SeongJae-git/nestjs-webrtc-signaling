@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import {
     OnGatewayDisconnect,
     OnGatewayInit,
@@ -28,6 +27,7 @@ export class RTCGateway implements OnGatewayInit, OnGatewayDisconnect {
     handleDisconnect(client: Socket): void {
         // 해당 유저가 참가된 룸 인원수 조회 후 0명이면 방 제거 로직 필요
         this.logger.log(`Client disconnected: ${client.id}`);
+        console.log(this.socketServer.of('/').adapter.rooms);
     }
 
     @SubscribeMessage('CTS-join')
@@ -40,7 +40,6 @@ export class RTCGateway implements OnGatewayInit, OnGatewayDisconnect {
                 break;
             }
             case RTC_STATUS.READY: {
-                console.log('준비완료 : ' + room);
                 const users = await this.rtcService.getParticipants(room);
                 console.log(users);
 
@@ -67,13 +66,6 @@ export class RTCGateway implements OnGatewayInit, OnGatewayDisconnect {
         const users = await this.rtcService.getParticipants(data.room);
 
         this.socketServer.to(users.sender).emit('STC-set-answer', data.answer);
-    }
-
-    @SubscribeMessage('reject')
-    public rejectCall(client: Socket, data: any): void {
-        client.to(data.from).emit('reject', {
-            socket: client.id
-        });
     }
 
     @SubscribeMessage('CTS-ice-candidate')
