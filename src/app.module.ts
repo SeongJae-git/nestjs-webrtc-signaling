@@ -5,6 +5,7 @@ import { RTCGateway } from './gateway/rtc.gateway';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { RedisRepository } from './redis/redis.repository';
 import { RTCService } from './services/rtc.service';
+import { TestController } from './test.controller';
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -24,7 +25,7 @@ import { RTCService } from './services/rtc.service';
             })
         })
     ],
-    controllers: [],
+    controllers: [TestController],
     providers: [RedisIoAdapter, RedisRepository, RTCGateway, RTCService]
 })
 export class AppModule {}

@@ -1,33 +1,34 @@
 import { Injectable, Logger } from '@nestjs/common';
-import {
-    OnGatewayDisconnect,
-    OnGatewayInit,
-    SubscribeMessage,
-    WebSocketGateway,
-    WebSocketServer
-} from '@nestjs/websockets';
+import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { RTC_STATUS } from 'src/enums/rtc.status.enum';
 import { RTCService } from 'src/services/rtc.service';
+import { CheckUtil } from 'src/utils/check.util';
 
 @Injectable()
-@WebSocketGateway(50080, { cors: true })
-export class RTCGateway implements OnGatewayInit, OnGatewayDisconnect {
-    private logger: Logger = new Logger(`EventGateway`);
+@WebSocketGateway(57012, {
+    cors: {
+        origin: [
+            'http://webrtc.osj-nas.synology.me',
+            'https://webrtc.osj-nas.synology.me',
+            'http://signal.osj-nas.synology.me',
+            'https://signal.osj-nas.synology.me'
+        ]
+    }
+})
+export class RTCGateway implements OnGatewayInit {
+    private logger: Logger = new Logger(`RTCGateway`);
 
     @WebSocketServer()
     socketServer: Server;
 
     constructor(private readonly rtcService: RTCService) {}
 
+    /**
+     * implements required methods...
+     */
     afterInit(_server: any): void {
         this.logger.log(`EventGateway Initialize Complete!`);
-    }
-
-    handleDisconnect(client: Socket): void {
-        // 해당 유저가 참가된 룸 인원수 조회 후 0명이면 방 제거 로직 필요
-        this.logger.log(`Client disconnected: ${client.id}`);
-        console.log(this.socketServer.of('/').adapter.rooms);
     }
 
     @SubscribeMessage('CTS-join')
@@ -41,13 +42,32 @@ export class RTCGateway implements OnGatewayInit, OnGatewayDisconnect {
             }
             case RTC_STATUS.READY: {
                 const users = await this.rtcService.getParticipants(room);
-                console.log(users);
 
                 this.socketServer.to(users.sender).emit('STC-offer', room);
                 this.socketServer.to(users.receiver).emit('STC-pending');
+                break;
             }
-            // case RTC_STATUS.FULL:
-            // case RTC_STATUS.REJECT
+            case RTC_STATUS.FULL: {
+                client.emit('STC-full');
+                break;
+            }
+        }
+    }
+
+    @SubscribeMessage('CTS-leave')
+    async handleLeaveRoom(client: Socket, room: string) {
+        client.leave(room);
+
+        const users = await this.socketServer.in(room).fetchSockets();
+
+        if (CheckUtil.isEmpty(users)) {
+            await this.rtcService.deleteRoom(room);
+        } else {
+            users.forEach((socket) => {
+                if (socket.id !== client.id) {
+                    socket.emit('STC-leave');
+                }
+            });
         }
     }
 
