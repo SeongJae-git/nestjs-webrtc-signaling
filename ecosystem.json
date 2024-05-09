@@ -5,7 +5,7 @@
 
             "exec_mode": "cluster",
 
-            "script": "dist/main.js",
+            "script": "dist/src/main.js",
 
             "instances": 3,
 
