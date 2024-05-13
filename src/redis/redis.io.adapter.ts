@@ -1,9 +1,11 @@
 import { IoAdapter } from '@nestjs/platform-socket.io';
-import { ServerOptions } from 'socket.io';
+import { Server, ServerOptions } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { createClient } from 'redis';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { HTTPS_OPTIONS } from 'certificates/_certificates.config';
+import * as https from 'https';
 
 @Injectable()
 export class RedisIoAdapter extends IoAdapter {
@@ -31,11 +33,17 @@ export class RedisIoAdapter extends IoAdapter {
         this.adapterConstructor = createAdapter(pubClient, subClient);
     }
 
-    createIOServer(port: number, options?: ServerOptions): any {
-        const server = super.createIOServer(port, options);
+    createIOServer(port: number, options?: ServerOptions): Server {
+        const httpsOptions = HTTPS_OPTIONS;
 
-        server.adapter(this.adapterConstructor);
+        const server = https.createServer(httpsOptions);
 
-        return server;
+        const io = new Server(server, options);
+
+        io.adapter(this.adapterConstructor);
+
+        server.listen(port);
+
+        return io;
     }
 }

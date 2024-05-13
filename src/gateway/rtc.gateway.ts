@@ -1,5 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import {
+    OnGatewayConnection,
+    OnGatewayInit,
+    SubscribeMessage,
+    WebSocketGateway,
+    WebSocketServer
+} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { RTC_STATUS } from 'src/enums/rtc.status.enum';
 import { RTCService } from 'src/services/rtc.service';
@@ -8,15 +14,11 @@ import { CheckUtil } from 'src/utils/check.util';
 @Injectable()
 @WebSocketGateway(57012, {
     cors: {
-        origin: [
-            'http://webrtc.osj-nas.synology.me',
-            'https://webrtc.osj-nas.synology.me',
-            'http://signal.osj-nas.synology.me',
-            'https://signal.osj-nas.synology.me'
-        ]
-    }
+        origin: ['https://webrtc.osj-nas.synology.me', 'https://signal.osj-nas.synology.me']
+    },
+    transports: ['websocket']
 })
-export class RTCGateway implements OnGatewayInit {
+export class RTCGateway implements OnGatewayInit, OnGatewayConnection {
     private logger: Logger = new Logger(`RTCGateway`);
 
     @WebSocketServer()
@@ -29,6 +31,10 @@ export class RTCGateway implements OnGatewayInit {
      */
     afterInit(_server: any): void {
         this.logger.log(`EventGateway Initialize Complete!`);
+    }
+
+    handleConnection(client: any, ..._args: any[]) {
+        this.logger.log(`Client Connected: ${client.id}`);
     }
 
     @SubscribeMessage('CTS-join')
