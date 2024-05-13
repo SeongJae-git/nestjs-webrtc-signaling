@@ -1,73 +1,26 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# NestJS WebRTC Signaling Server
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Overview
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+NestJS를 기반으로 한 실시간 WebRTC 통신 시그널링 서버를 구축해보았습니다.
 
-## Description
+![WebRTC](https://remysharp.com/images/primus-scale.svg)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Features
 
-## Installation
+-   **[NestJS](https://nestjs.com/)**: 현대적인 서버 사이드 애플리케이션을 위한 프레임워크.
+-   **[Socket.io](https://socket.io/)**: 실시간 양방향 이벤트 기반 통신
+-   **[Redis](https://redis.io/)**: 고성능 키-값 저장소, pub/sub 패턴을 통한 메시지 브로커
+-   **[WebRTC](https://webrtc.org/)**: 브라우저 간 직접적인 통신을 위한 API
+-   **[PM2](https://pm2.keymetrics.io/)**: 무중단 운영과 다중 클러스터를 통한 로드밸런싱
+-   **[Docker](https://www.docker.com/)**: 일관된 개발 환경을 제공하는 컨테이너화 도구
 
-```bash
-$ npm install
-```
+**Redis의 pub/sub 패턴**을 이용해 다중 클러스터 환경에서 단일 소켓 서버 이벤트처럼 동작하게 구성하였으며, **Let's Encrypt**를 통해 SSL/TLS 인증서를 발급받아 적용하여 HTTPS를 구현했습니다.
 
-## Running the app
+### CORS Policy
 
-```bash
-# development
-$ npm run start
+CORS 정책으로 인해 HTML 파일에서의 접근은 제한됩니다. 따라서 별도의 테스트 페이지용 서버와 웹소켓 게이트웨이 서버를 구성하였습니다.
 
-# watch mode
-$ npm run start:dev
+## Preview
 
-# production mode
-$ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+[**Explore the DEMO here!**](http://webrtc.osj-nas.synology.me/)
